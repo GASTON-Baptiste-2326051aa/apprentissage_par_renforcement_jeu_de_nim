@@ -1,4 +1,9 @@
 def update(nb_matches):
+    """
+    Fonction mettant à jour le plateau de jeu basé sur le nombre d'allumettes actuel.
+    :param nb_matches: Nombre d'allumettes dans le jeu
+    :return: Un tableau représentant notre plateau de jeu
+    """
     board=[]
     for _ in range(nb_matches):
         board.append("/")
@@ -6,6 +11,10 @@ def update(nb_matches):
 
 
 def game():
+    """
+    Fonction principale permettant de jouer au jeu de Nim, opposant un joueur à une machine.
+    :return: Ne retourne rien, met fin au programme.
+    """
     play = True
     while play:
         board = []

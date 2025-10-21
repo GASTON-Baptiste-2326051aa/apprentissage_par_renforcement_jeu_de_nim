@@ -50,20 +50,33 @@ for i in range(matches):
     worksheet.write(5, states_offset+i, 8-i, glob_titles_format)
 
 games_offset = 7
-game_height = 5
+game_height = 6
 
-def add_game():
+def add_game(results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = [], cups_reseted_p2 = []):
+    first_row = games_offset+game_height*(game_counter-1)
+    last_row = games_offset+game_height*game_counter-1
     worksheet.merge_range(
-        games_offset+game_height*(game_counter-1), 0,
-        games_offset+game_height*game_counter, 0,
+        first_row, 0,
+        last_row, 0,
         game_counter, games_titles_format
     )
-    
+    worksheet.write(first_row, 1, "P1", games_titles_format)
+    worksheet.write(first_row+1, 1, "P2", games_titles_format)
+    worksheet.merge_range(
+        first_row+2, 1,
+        first_row+3, 1,
+        "P1", games_titles_format
+    )
+    worksheet.merge_range(
+        first_row+4, 1,
+        first_row+5, 1,
+        "P2", games_titles_format
+    )
     
 game_counter += 1
-add_game()
+add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [])
 game_counter += 1
-#add_game()
+add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [])
 
 
 

@@ -1,7 +1,6 @@
 import random
 
-colors =  ["red", "yellow"] # jaune = 1 allumette, rouge = 2 allumettes
-countByColor = 5
+tableau_couleur = {"red": 1, "yellow": 2}
 
 def update(nb_matches):
     """
@@ -29,7 +28,7 @@ def init_cups(nb_cups, nb_marbles_per_color):
             cup.append("red")
             cup.append("yellow")
         cups.append(cup)
-    cups[nb_cups-1] = ["red"]*nb_marbles_per_color 
+    cups[nb_cups-1] = ["yellow"]*nb_marbles_per_color 
     
     return cups
 
@@ -43,23 +42,20 @@ def learning(path, win, cups, nb_marbles) :
     :param nb_marbles: nombre de billes à ajouter ou retirer
     :return: nouveau tableau après apprentissage
     """
+    for p in path :
+        cup_index, color = p
     if win :
-        # Pour chaque gobelet traversé, on ajoute une bille de la couleur piochée
-        for cup in path :
-            # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
-            # La couleur qui a permis de gagner
-            for j in range(nb_marbles) :
-                cups[cup[0]].append(cup[1])
+        # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
+        # La couleur qui a permis de gagner
+        for _ in range(nb_marbles) :
+            cups[cup_index].append(color)
     else :
-        for cup in path :
-            for j in range(nb_marbles) :
-                # Si le gobelet est vide, on le réinitialise
-                if len(cups[cup[0]]) == 0:
-                    reset_cup(5, ["yellow", "red"])
-                    break
-                # Si la bille est dans le gobelet, on la retire
-                elif cup[1] in cups[cup[0]] :
-                    cups[cup[0]].remove(cup[1])
+        for _ in range(nb_marbles) :
+            if color in cups[cup_index] :
+                cups[cup_index].remove(color)
+
+        if len(cups[cup_index]) == 0:
+            cups[cup_index]=reset_cup(2, ["yellow", "red"])
     return cups
 
 def reset_cup(default_count, colors):
@@ -69,6 +65,7 @@ def reset_cup(default_count, colors):
     :param colors:
     :return:
     """
+    print("Réinitialisation du gobelet...")
     return [color for color in colors for _ in range(default_count)]
 
 
@@ -80,12 +77,15 @@ def game():
     :return: Ne retourne rien, met fin au programme.
     """
     play = True
+    cups = init_cups(8,3)
 
     while play:
         board = []
         path = []
-        cups = init_cups(8,2)
+
         nb_matches = 8
+        player = "MACHINE"
+        """
         print("Qui va jouer en premier ? (1 pour l'ordinateur, 2 pour vous)")
         choice = input()
 
@@ -94,13 +94,11 @@ def game():
 
         else:
             player = "JOUEUR"
+        """
 
         while nb_matches > 0:
             
-            if player == "JOUEUR":
-                
-                if nb_matches == 0:
-                    break
+            if player == "JOUEUR":         
 
                 print("Combien d'allumettes voulez-vous retirer ? (1 ou 2)")
                 choice_matches = int(input())
@@ -115,47 +113,53 @@ def game():
                 board = update(nb_matches)
                 print(board)
 
-
-                player = "MACHINE"
-
-
-            elif player == "MACHINE":
-                
                 if nb_matches == 0:
                     break
 
+
+                player = "MACHINE"
+                                
+
+            else:
                 print("L'ordinateur joue...")
                 cups_index = cups[nb_matches - 1]
-                print(cups_index)
                 choice = random.choice(cups_index)
-                path.append([nb_matches - 1, choice])
                 if choice == "red":
                     choice_matches = 2
 
                 else:
                     choice_matches = 1
 
+                if nb_matches - choice_matches >= 0:
+                    path.append([nb_matches - 1, choice])
+
                 nb_matches-=choice_matches
                 print("L'ordinateur retire " + str(choice_matches) + " allumette(s).")
                 board = update(nb_matches)
                 print(board)
 
+                if nb_matches == 0:
+                    break
+
                 player = "JOUEUR"
+
+
 
             print("Il reste " + str(nb_matches) + " allumettes.")
 
 
-        print(path)
+        print("Chemin de la partie : ", path)
         if player == "JOUEUR":
             print("Le joueur gagne ! Nous allons punir la machine !")
-            learning(path, False, cups, 2)
+            cups = learning(path, False, cups, 2)
 
         elif player == "MACHINE":
             print("La machine gagne ! Nous allons récompenser la machine !")
-            learning(path, True, cups, 2)
+            cups = learning(path, True, cups, 2)
 
+        print("État des gobelets après apprentissage : ", cups)
 
-
+        """
         print("Voulez-vous rejouer ? Appuyez sur 'o'")
         response = input().lower()
 
@@ -163,6 +167,7 @@ def game():
             play = True
         else:
             play = False
+        """
 
     return
 

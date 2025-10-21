@@ -1,6 +1,6 @@
 import random
 
-tableau_couleur = {"red": 1, "yellow": 2}
+tableau_couleur = {"yellow": 1, "red": 2}
 
 def update(nb_matches):
     """
@@ -42,20 +42,19 @@ def learning(path, win, cups, nb_marbles) :
     :param nb_marbles: nombre de billes à ajouter ou retirer
     :return: nouveau tableau après apprentissage
     """
-    for p in path :
-        cup_index, color = p
-    if win :
-        # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
-        # La couleur qui a permis de gagner
-        for _ in range(nb_marbles) :
-            cups[cup_index].append(color)
-    else :
-        for _ in range(nb_marbles) :
-            if color in cups[cup_index] :
-                cups[cup_index].remove(color)
+    for cup_index, color in path :
+        if win :
+            # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
+            # La couleur qui a permis de gagner
+            for _ in range(nb_marbles) :
+                cups[cup_index].append(color)
+        else :
+            for _ in range(nb_marbles) :
+                if color in cups[cup_index] :
+                    cups[cup_index].remove(color)
 
-        if len(cups[cup_index]) == 0:
-            cups[cup_index]=reset_cup(2, ["yellow", "red"])
+            if len(cups[cup_index]) == 0:
+                cups[cup_index]=reset_cup(2, ["yellow", "red"])
     return cups
 
 def reset_cup(default_count, colors):
@@ -77,63 +76,51 @@ def game():
     :return: Ne retourne rien, met fin au programme.
     """
     play = True
-    cups = init_cups(8,3)
+    cups = init_cups(8,2)
 
     while play:
         board = []
         path = []
 
         nb_matches = 8
-        player = "MACHINE"
-        """
-        print("Qui va jouer en premier ? (1 pour l'ordinateur, 2 pour vous)")
-        choice = input()
-
-        if choice == "1":
-            player = "MACHINE"
-
-        else:
-            player = "JOUEUR"
-        """
+        player = "MACHINE" # On fait commencer la machine par défaut.
+        print("Nouvelle partie ! Il y a " + str(nb_matches) + " allumettes sur le plateau.")
+        board = update(nb_matches)
+        print(board)
 
         while nb_matches > 0:
-            
+
             if player == "JOUEUR":         
 
-                print("Combien d'allumettes voulez-vous retirer ? (1 ou 2)")
-                choice_matches = int(input())
-                while choice_matches > nb_matches:
+                choice_matches = int(input("Combien d'allumettes voulez-vous retirer ? (1 ou 2)"))
+                while choice_matches not in [1, 2] or choice_matches > nb_matches:
                     if choice_matches not in [1, 2]:
                         print("Vous devez choisir 1 ou 2 allumettes.")
-                    elif choice_matches > nb_matches:
-                        print("Il ne reste que " + str(nb_matches) + " allumette !")
+                    else:
+                        print("Il ne reste que " + str(nb_matches) + " allumette(s) !")
                     choice_matches = int(input("Combien d'allumettes voulez-vous retirer ? (1 ou 2) "))
 
-                nb_matches-=choice_matches
+                nb_matches -= choice_matches
                 board = update(nb_matches)
                 print(board)
 
                 if nb_matches == 0:
                     break
 
-
                 player = "MACHINE"
-                                
 
             else:
                 print("L'ordinateur joue...")
-                cups_index = cups[nb_matches - 1]
+                cups_index = cups[len(cups) - nb_matches]
                 choice = random.choice(cups_index)
-                if choice == "red":
-                    choice_matches = 2
-
+                if choice == "red": 
+                    choice_matches = 2 
                 else:
                     choice_matches = 1
 
-                if nb_matches - choice_matches >= 0:
-                    path.append([nb_matches - 1, choice])
+                path.append((len(cups) - nb_matches, choice))
 
-                nb_matches-=choice_matches
+                nb_matches -= choice_matches
                 print("L'ordinateur retire " + str(choice_matches) + " allumette(s).")
                 board = update(nb_matches)
                 print(board)
@@ -143,19 +130,16 @@ def game():
 
                 player = "JOUEUR"
 
-
-
-            print("Il reste " + str(nb_matches) + " allumettes.")
-
+            print("Il reste " + str(nb_matches) + " allumette(s).")
 
         print("Chemin de la partie : ", path)
         if player == "JOUEUR":
             print("Le joueur gagne ! Nous allons punir la machine !")
-            cups = learning(path, False, cups, 2)
+            cups = learning(path, False, cups, 1)
 
         elif player == "MACHINE":
             print("La machine gagne ! Nous allons récompenser la machine !")
-            cups = learning(path, True, cups, 2)
+            cups = learning(path, True, cups, 1)
 
         print("État des gobelets après apprentissage : ", cups)
 
@@ -170,6 +154,7 @@ def game():
         """
 
     return
+
 
 
 game()

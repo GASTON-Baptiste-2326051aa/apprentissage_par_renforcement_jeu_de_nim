@@ -73,10 +73,19 @@ def add_game(results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = []
         "P2", games_titles_format
     )
     
+    worksheet.write(first_row, 3, json.dumps(cups_reseted_p1) if len(cups_reseted_p1) > 0 else "-")
+    worksheet.write(first_row+1, 3, json.dumps(cups_reseted_p2) if len(cups_reseted_p2) > 0 else "-")
+
+
+    
 game_counter += 1
 add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [])
 game_counter += 1
-add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [])
+add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [], cups_reseted_p1 = ["8", "3"])
+game_counter += 1
+add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
+game_counter += 1
+add_game({"P1": "gagne", "P2": "perd"}, [[5, 'red'], [2, 'red']], [[7, 'red'], [3, 'yellow']], [], [], cups_reseted_p2 = ["5", "2"])
 
 
 

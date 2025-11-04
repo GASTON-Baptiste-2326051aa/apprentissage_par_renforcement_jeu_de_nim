@@ -109,18 +109,34 @@ def add_game(results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = []
         'format': no_step
     })
     
+    for cup_index in range(len(cups_p1)):
+        cup = cups_p1[cup_index]
+        if (len(cup) == 0):
+            continue
+        counter = 0
+        for color in take:
+            counter += 1
+            worksheet.write(first_row+1+counter, states_offset+cup_index, cup.count(color)/max(len(cup), 1), glob_values_format)
     
+    for cup_index in range(len(cups_p2)):
+        cup = cups_p2[cup_index]
+        if (len(cup) == 0):
+            continue
+        counter = 0
+        for color in take:
+            counter += 1
+            worksheet.write(first_row+1+nb_take+counter, states_offset+cup_index, cup.count(color)/max(len(cup), 1), glob_values_format)
 
 
     
 game_counter += 1
-add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [], [])
+add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
 game_counter += 1
-add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [], [], cups_reseted_p1 = ["8", "3"])
+add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
 game_counter += 1
-add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [], [], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
+add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
 game_counter += 1
-add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [], [], cups_reseted_p2 = ["5", "2"])
+add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
 
 
 

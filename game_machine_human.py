@@ -78,6 +78,8 @@ def game():
     while play:
         board = []
         path = []
+        score_1 = 0
+        score_2 = 0
 
         nb_matches = 8
         player = "MACHINE" # On fait commencer la machine par défaut.
@@ -133,10 +135,12 @@ def game():
         if player == "JOUEUR":
             print("Le joueur gagne ! Nous allons punir la machine !")
             cups = learning(path, False, cups, 1)
+            score_1 += 1
 
         elif player == "MACHINE":
             print("La machine gagne ! Nous allons récompenser la machine !")
             cups = learning(path, True, cups, 1)
+            score_2 += 1
 
         
         print("État des gobelets après apprentissage : ", cups)

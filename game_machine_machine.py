@@ -1,6 +1,6 @@
 import random
 
-tableau_couleur = {"yellow": 1, "red": 2}
+table_color = {"yellow": 1, "red": 2}
 
 
 def update(nb_matches):
@@ -67,7 +67,7 @@ def reset_cup(default_count, colors):
     return [color for color in colors for _ in range(default_count)]
 
 
-def game(max_games = 30, number_matches=11):
+def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
     """
     Fonction principale permettant de jouer au jeu de Nim, opposant un joueur à une machine.
     :return: Ne retourne rien, met fin au programme.
@@ -76,16 +76,14 @@ def game(max_games = 30, number_matches=11):
     cups_2 = init_cups(number_matches,6)
     score_1 = 0
     score_2 = 0
-    partie = 1
+    game = 1
 
-    while max_games >= partie:
-        board = []
+    while max_games >= game:
         path_1 = []
         path_2 = []
 
         nb_matches = number_matches
         player = "MACHINE 1" # On fait commencer la machine 1 par défaut.
-        board = update(nb_matches)
 
         while nb_matches > 0:
 
@@ -93,15 +91,11 @@ def game(max_games = 30, number_matches=11):
                 
                 cups_index = cups_1[len(cups_1) - nb_matches]
                 choice = random.choice(cups_index)
-                if choice == "red": 
-                    choice_matches = 2 
-                else:
-                    choice_matches = 1
+                choice_matches = table_color.get(choice)
 
                 path_1.append((len(cups_1) - nb_matches, choice))
 
                 nb_matches -= choice_matches
-                board = update(nb_matches)
 
                 if nb_matches == 0:
                     break
@@ -119,7 +113,6 @@ def game(max_games = 30, number_matches=11):
                 path_2.append((len(cups_2) - nb_matches, choice))
 
                 nb_matches -= choice_matches
-                board = update(nb_matches)
 
                 if nb_matches == 0:
                     break
@@ -128,16 +121,16 @@ def game(max_games = 30, number_matches=11):
 
 
         if player == "MACHINE 1":
-            cups_1 = learning(path_1, True, cups_1, 3)
-            cups_2 = learning(path_2, False, cups_2, 1)
+            cups_1 = learning(path_1, True, cups_1, rewards)
+            cups_2 = learning(path_2, False, cups_2, punishment)
             score_1 += 1
 
         elif player == "MACHINE 2":
-            cups_2 = learning(path_2, True, cups_2, 3)
-            cups_1 = learning(path_1, False, cups_1, 1)
+            cups_2 = learning(path_2, True, cups_2, rewards)
+            cups_1 = learning(path_1, False, cups_1, punishment)
             score_2 += 1
 
-        partie += 1
+        game += 1
 
 
         """
@@ -150,8 +143,9 @@ def game(max_games = 30, number_matches=11):
             play = False
         """
 
-    return f"Score final : {score_1}-{score_2} en {partie} parties."
+    return f"Score final : {score_1}-{score_2} en {game-1} parties."
 
 
-
-print(game(max_games=300))
+print(game(max_games=200))
+print(game(max_games=100))
+print(game(max_games=30))

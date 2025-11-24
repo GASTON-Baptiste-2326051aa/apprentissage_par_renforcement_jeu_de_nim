@@ -25,7 +25,7 @@ no_step = workbook.add_format({
 
 matches = 8
 take = {"red": 1, "yellow": 2, "blue": 4}
-default_proba = 0.5
+default_proba = round(1/len(take), 3)
 default_count = 5
 recompense = 2
 punition = 1
@@ -116,7 +116,7 @@ def add_game(results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = []
         counter = 0
         for color in take:
             counter += 1
-            worksheet.write(first_row+1+counter, states_offset+cup_index, cup.count(color)/max(len(cup), 1), glob_values_format)
+            worksheet.write(first_row+1+counter, states_offset+cup_index, round(cup.count(color)/max(len(cup), 1), 3), glob_values_format)
     
     for cup_index in range(len(cups_p2)):
         cup = cups_p2[cup_index]

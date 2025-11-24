@@ -1,6 +1,8 @@
 import random
 
 tableau_couleur = {"yellow": 1, "red": 2}
+NUMBER_MATCHES = 11
+
 
 def update(nb_matches):
     """
@@ -73,15 +75,13 @@ def game():
     :return: Ne retourne rien, met fin au programme.
     """
     play = True
-    cups = init_cups(8,2)
+    cups = init_cups(NUMBER_MATCHES,6)
 
     while play:
         board = []
         path = []
-        score_1 = 0
-        score_2 = 0
 
-        nb_matches = 8
+        nb_matches = NUMBER_MATCHES
         player = "MACHINE" # On fait commencer la machine par défaut.
         print("Nouvelle partie ! Il y a " + str(nb_matches) + " allumettes sur le plateau.")
         board = update(nb_matches)
@@ -135,12 +135,10 @@ def game():
         if player == "JOUEUR":
             print("Le joueur gagne ! Nous allons punir la machine !")
             cups = learning(path, False, cups, 1)
-            score_1 += 1
 
         elif player == "MACHINE":
             print("La machine gagne ! Nous allons récompenser la machine !")
-            cups = learning(path, True, cups, 1)
-            score_2 += 1
+            cups = learning(path, True, cups, 3)
 
         
         print("État des gobelets après apprentissage : ", cups)

@@ -1,6 +1,7 @@
-import random, time
+import random
 
 tableau_couleur = {"yellow": 1, "red": 2}
+
 
 def update(nb_matches):
     """
@@ -63,35 +64,32 @@ def reset_cup(default_count, colors):
     :param colors:
     :return:
     """
-    print("Réinitialisation du gobelet...")
     return [color for color in colors for _ in range(default_count)]
 
 
-def game():
+def game(max_games = 30, number_matches=11):
     """
     Fonction principale permettant de jouer au jeu de Nim, opposant un joueur à une machine.
     :return: Ne retourne rien, met fin au programme.
     """
-    play = True
-    cups_1 = init_cups(8,2)
-    cups_2 = init_cups(8,2)
+    cups_1 = init_cups(number_matches,6)
+    cups_2 = init_cups(number_matches,6)
+    score_1 = 0
+    score_2 = 0
+    partie = 1
 
-    while play:
+    while max_games >= partie:
         board = []
         path_1 = []
         path_2 = []
 
-        nb_matches = 8
+        nb_matches = number_matches
         player = "MACHINE 1" # On fait commencer la machine 1 par défaut.
-        print("Nouvelle partie ! Il y a " + str(nb_matches) + " allumettes sur le plateau.")
         board = update(nb_matches)
-        print(board)
 
         while nb_matches > 0:
 
             if player == "MACHINE 1":         
-                print("La machine 1 joue...")
-                time.sleep(2)
                 
                 cups_index = cups_1[len(cups_1) - nb_matches]
                 choice = random.choice(cups_index)
@@ -103,12 +101,7 @@ def game():
                 path_1.append((len(cups_1) - nb_matches, choice))
 
                 nb_matches -= choice_matches
-                print("La machine 1 retire " + str(choice_matches) + " allumette(s).")
                 board = update(nb_matches)
-                print(board)
-
-                if nb_matches == 0:
-                    break
 
                 if nb_matches == 0:
                     break
@@ -116,8 +109,6 @@ def game():
                 player = "MACHINE 2"
 
             else:
-                print("La machine 2 joue...")
-                time.sleep(2)
                 cups_index = cups_2[len(cups_2) - nb_matches]
                 choice = random.choice(cups_index)
                 if choice == "red": 
@@ -128,31 +119,25 @@ def game():
                 path_2.append((len(cups_2) - nb_matches, choice))
 
                 nb_matches -= choice_matches
-                print("La machine 2 retire " + str(choice_matches) + " allumette(s).")
                 board = update(nb_matches)
-                print(board)
 
                 if nb_matches == 0:
                     break
 
                 player = "MACHINE 1"
 
-            print("Il reste " + str(nb_matches) + " allumette(s).")
 
-        print("Chemin de la partie : ", path_1, path_2)
         if player == "MACHINE 1":
-            print("La machine 1 gagne ! Nous allons récompenser la machine 1 et punir la machine 2 !")
-            cups_1 = learning(path_1, True, cups_1, 1)
+            cups_1 = learning(path_1, True, cups_1, 3)
             cups_2 = learning(path_2, False, cups_2, 1)
+            score_1 += 1
 
-        elif player == "MACHINE":
-            print("La machine 2 gagne ! Nous allons récompenser la machine 2 et punir la machine 1 !")
-            cups_2 = learning(path_2, True, cups_2, 1)
+        elif player == "MACHINE 2":
+            cups_2 = learning(path_2, True, cups_2, 3)
             cups_1 = learning(path_1, False, cups_1, 1)
+            score_2 += 1
 
-        
-        print("État des gobelets de la machine 1 après apprentissage : ", cups_1)
-        print("État des gobelets de la machine 2 après apprentissage : ", cups_2)
+        partie += 1
 
 
         """
@@ -165,8 +150,8 @@ def game():
             play = False
         """
 
-    return
+    return f"Score final : {score_1}-{score_2} en {partie} parties."
 
 
 
-game()
+print(game(max_games=300))

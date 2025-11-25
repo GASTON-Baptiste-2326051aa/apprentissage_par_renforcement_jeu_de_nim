@@ -3,15 +3,36 @@ import json
 
 
 class WriteExcel:
+    """
+    Classe créant un fichier excel et gérant son édition.
+    """
+
     def __init__(self, path):
+        """
+        Fonction d'initialisation des instances de la classe WriteExcel.
+        Initialise un fichier excel, une instance des formatages des cellules nécessaires pour le excel et une instance de feuille de calcul.
+        :param path: Chemin du fichier excel
+        """
+
         self.workbook = xlsxwriter.Workbook(path)
         self.formats = AddFormat(self.workbook)
         self.worksheet: WriteSheet = None
     
     def add_sheet(self, name, matches, take, default_count, reward, punishment):
+        """
+        Ajoute et initialise une nouvelle feuille de calcul au fichier excel.
+        :param name: Nom de la feuille
+        :param: matches: Nombre d'allumettes du jeu
+        :param take: Les différents coups possibles du jeu
+        :param default_count: Le nombre de billes de chaque couleur dans chaque gobelet au moment de l'initialisation
+        :param reward: La récompense en cas de victoire
+        :param punishment: La punition en cas de défaite
+        """
+
         if self.worksheet != None:
-            self.worksheet.autofit_worksheet()
+            self.worksheet.autofit_worksheet()  # Pour une mise en page propre et lisible de la feuille
         
+        # Gère les noms des feuilles (évite les doublons)
         while (True):
             try:
                 self.worksheet = WriteSheet(self.workbook, name, matches, take, default_count, reward, punishment, self.formats)
@@ -28,12 +49,27 @@ class WriteExcel:
                     name += "-1"        
     
     def close_workbook(self):
+        """
+        Ferme le fichier excel en édition.
+        """
+
         if self.worksheet != None:
             self.worksheet.autofit_worksheet()
         self.workbook.close()
 
+
 class AddFormat:
+    """
+    Classe créant les différents formatages des cellules nécessaires pour un fichier excel donné.
+    """
+
     def __init__(self, workbook: xlsxwriter.Workbook):
+        """
+        Fonction d'initialisation des instances de la classe AddFormat.
+        Initialise tous les différents formatages des cellules qui seront utilisés pour le fichier excel passé en paramètre.
+        :param workbook: Le fichier excel
+        """
+
         self.glob_titles_format = workbook.add_format({
             "bold": 1,
             "bg_color": "#999999",
@@ -53,7 +89,24 @@ class AddFormat:
         })
 
 class WriteSheet:
+    """
+    Classe créant une feuille de calcul pour un fichier excel donné et gérant son édition.
+    """
+
     def __init__(self, workbook: xlsxwriter.Workbook, name, matches, take, default_count, reward, punishment, formats: AddFormat):
+        """
+        Fonction d'initialisation des instances de la classe WriteSheet.
+        Initialise une feuille de calcul et y écrit les paramètres du jeu.
+        :param workbook: Le fichier excel
+        :param name: Nom de la feuille
+        :param: matches: Nombre d'allumettes du jeu
+        :param take: Les différents coups possibles du jeu
+        :param default_count: Le nombre de billes de chaque couleur dans chaque gobelet au moment de l'initialisation
+        :param reward: La récompense en cas de victoire
+        :param punishment: La punition en cas de défaite
+        :param formats: Instance de la classe AddFormat
+        """
+
         self.workbook = workbook
         self.worksheet = self.workbook.add_worksheet(name)
         
@@ -75,6 +128,10 @@ class WriteSheet:
     
     
     def setup(self):
+        """
+        Prépare la feuille en y écrivant les paramètres du jeu et les intitulés des colonnes.
+        """
+
         glob_titles = ["max allumettes", "coups possibles", "proba initiale de chaque coup", "nb billes/couleur", "récompense", "punition"]
         glob_values = [self.matches, self.take, round(1/(self.nb_take), 3), self.default_count, self.reward, self.punishment]
         
@@ -93,6 +150,17 @@ class WriteSheet:
     
     
     def add_game(self, results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = [], cups_reseted_p2 = []):
+        """
+        Rajoute les données associées à une partie sur la feuille.
+        :param results: Tableau indiquant quel joueur a gagné et quel joueur a perdu la partie
+        :param steps_p1: Tableau retraçant les coups joués par le joueur 1
+        :param steps_p2: Tableau retraçant les coups joués par le joueur 2
+        :param cups_p1: Tableau contenant l'état des gobelets du joueur 1 après application des récompenses et punitions
+        :param cups_p2: Tableau contenant l'état des gobelets du joueur 2 après application des récompenses et punitions
+        :param cups_reseted_p1: Tableau contenant la liste des gobelets du joueur 1 qui ont été complètement vidés par la punition après la partie et qui ont dû être réinitialisés
+        :param cups_reseted_p2: Tableau contenant la liste des gobelets du joueur 2 qui ont été complètement vidés par la punition après la partie et qui ont dû être réinitialisés
+        """
+
         self.game_counter += 1
         
         first_row = self.games_offset+self.game_height*(self.game_counter-1)
@@ -169,49 +237,8 @@ class WriteSheet:
                 self.worksheet.write(first_row+1+self.nb_take+counter, self.states_offset+cup_index, round(cup.count(color)/max(len(cup), 1), 3), self.formats.glob_values_format)
     
     def autofit_worksheet(self):
+        """
+        Gère la mise en page de la feuille pour la rendre propre et lisible.
+        """
+        
         self.worksheet.autofit()
-
-
-matches = 8
-take = {"red": 1, "yellow": 2, "blue": 4}
-default_count = 5
-reward = 2
-punishment = 1
-
-writer = WriteExcel("../test.xlsx")
-writer.add_sheet("test", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test-1", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test-5", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.add_sheet("test", matches, take, default_count, reward, punishment)
-writer.worksheet.add_game({"P1": "gagne", "P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']])
-writer.worksheet.add_game({"P2": "perd"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], [[]], cups_reseted_p1 = ["8", "3"])
-writer.worksheet.add_game({"P1": "gagne"}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']], cups_reseted_p1 = ["8", "3"], cups_reseted_p2 = ["5", "2"])
-writer.worksheet.add_game({}, [[7, 'red'], [4, 'yellow'], [1, 'yellow']], [[6, 'yellow'], [2, 'red']], [[]], [[]], cups_reseted_p2 = ["5", "2"])
-writer.close_workbook()

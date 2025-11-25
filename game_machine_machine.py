@@ -34,7 +34,7 @@ def init_cups(nb_cups, nb_marbles_per_color):
     return cups
 
 
-def learning(path, win, cups, nb_marbles) :
+def learning(path, win, cups, nb_marbles, reset_history) :
     """
     Fonction permettant de faire apprendre la machine
     :param path: tableau contenant les gobelets parcourus par la machine ainsi que la couleur de la bille piochée
@@ -55,7 +55,9 @@ def learning(path, win, cups, nb_marbles) :
                     cups[cup_index].remove(color)
 
             if len(cups[cup_index]) == 0:
+                reset_history.append(cup_index)
                 cups[cup_index]=reset_cup(2, ["yellow", "red"])
+                
     return cups
 
 def reset_cup(default_count, colors):
@@ -82,8 +84,10 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
     score_1 = 0
     score_2 = 0
     game = 1
-
+    
     while max_games >= game:
+        reset_history_1 = []
+        reset_history_2 = []
         path_1 = []
         path_2 = []
 
@@ -126,14 +130,14 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
 
 
         if player == "MACHINE 1":
-            cups_1 = learning(path_1, True, cups_1, rewards)
-            cups_2 = learning(path_2, False, cups_2, punishment)
+            cups_1 = learning(path_1, True, cups_1, rewards, reset_history_1)
+            cups_2 = learning(path_2, False, cups_2, punishment, reset_history_2)
             score_1 += 1
             results = {"P1": "gagne", "P2": "perd"} # Les résultats finaux de la partie pour le excel
 
         elif player == "MACHINE 2":
-            cups_2 = learning(path_2, True, cups_2, rewards)
-            cups_1 = learning(path_1, False, cups_1, punishment)
+            cups_2 = learning(path_2, True, cups_2, rewards, reset_history_2)
+            cups_1 = learning(path_1, False, cups_1, punishment, reset_history_1)
             score_2 += 1
             results = {"P1": "perd", "P2": "gagne"} # Les résultats finaux de la partie pour le excel
 
@@ -151,6 +155,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
         else:
             play = False
         """
+        print(reset_history_1, reset_history_2)
 
     return f"Score final : {score_1}-{score_2} en {game-1} parties."
 

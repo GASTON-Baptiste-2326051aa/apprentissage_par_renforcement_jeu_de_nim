@@ -149,10 +149,12 @@ class WriteSheet:
             self.worksheet.write(5, self.states_offset+i, self.matches-i, self.formats.glob_titles_format)
     
     
-    def add_game(self, results, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = [], cups_reseted_p2 = []):
+    def add_game(self, results, score_p1, score_p2, steps_p1, steps_p2, cups_p1, cups_p2, cups_reseted_p1 = [], cups_reseted_p2 = []):
         """
         Rajoute les données associées à une partie sur la feuille.
         :param results: Tableau indiquant quel joueur a gagné et quel joueur a perdu la partie
+        :param score_p1: Score du joueur 1 après la partie
+        :param score_p2: Score du joueur 2 après la partie
         :param steps_p1: Tableau retraçant les coups joués par le joueur 1
         :param steps_p2: Tableau retraçant les coups joués par le joueur 2
         :param cups_p1: Tableau contenant l'état des gobelets du joueur 1 après application des récompenses et punitions
@@ -174,6 +176,9 @@ class WriteSheet:
         
         self.worksheet.write(first_row, 1, "P1", self.formats.games_titles_format)
         self.worksheet.write(first_row+1, 1, "P2", self.formats.games_titles_format)
+        
+        self.worksheet.write(first_row, 2, score_p1, self.formats.games_titles_format)
+        self.worksheet.write(first_row+1, 2, score_p2, self.formats.games_titles_format)
         
         self.worksheet.merge_range(
             first_row+2, 1,

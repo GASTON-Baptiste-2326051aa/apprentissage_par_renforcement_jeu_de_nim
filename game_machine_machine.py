@@ -144,7 +144,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
         game += 1
 
         # Ecriture des données de la partie sur la feuille
-        writer.worksheet.add_game(results, path_1, path_2, cups_1, cups_2, cups_reseted_p1=reset_history_1, cups_reseted_p2=reset_history_2)
+        writer.worksheet.add_game(results, score_1, score_2, path_1, path_2, cups_1, cups_2, cups_reseted_p1=reset_history_1, cups_reseted_p2=reset_history_2)
 
         """
         print("Voulez-vous rejouer ? Appuyez sur 'o'")

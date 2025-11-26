@@ -2,6 +2,52 @@ import xlsxwriter
 import json
 
 
+class WriteExcelReduced:
+    """
+    Classe créant un fichier excel et gérant son édition (version réduite)
+    """
+
+    def __init__(self, path):
+        """
+        Fonction d'initialisation des instances de la classe WriteExcelReduced.
+        Initialise un fichier excel et crée de feuille de calcul.
+        :param path: Chemin du fichier excel
+        """
+
+        self.workbook = xlsxwriter.Workbook(path)
+        self.worksheet: WriteSheet = None
+        self.game_counter = None
+    
+    def add_sheet(self, name):
+        """
+        Ajoute et initialise une nouvelle feuille de calcul au fichier excel.
+        :param name: Nom de la feuille
+        """
+
+        if self.worksheet != None:
+            self.worksheet.autofit_worksheet()  # Pour une mise en page propre et lisible de la feuille
+        
+        # Gère les noms des feuilles (évite les doublons)
+        while (True):
+            try:
+                self.worksheet = self.workbook.add_worksheet(name)
+                break
+            except:
+                last_occ = name.rfind('-')
+                if last_occ > -1:
+                    number = name[last_occ+1:]
+                    if number.isdigit():
+                        name = name[:last_occ+1]+str(int(number)+1)
+                    else:
+                        name += "-1"
+                else:
+                    name += "-1"
+    
+    def add_game(self, winner):
+        return
+        
+
+
 class WriteExcel:
     """
     Classe créant un fichier excel et gérant son édition.
@@ -46,7 +92,7 @@ class WriteExcel:
                     else:
                         name += "-1"
                 else:
-                    name += "-1"        
+                    name += "-1"
     
     def close_workbook(self):
         """

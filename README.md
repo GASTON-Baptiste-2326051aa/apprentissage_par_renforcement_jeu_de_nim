@@ -46,7 +46,7 @@ py game_machine_machine.py
 - [@TAMINE-CYRIL](https://github.com/TAMINE-CYRIL)
 - [@GASTON-Baptiste-2326051aa](https://github.com/GASTON-Baptiste-2326051aa)
 - [@ALVARES-Titouan-2326003b](https://github.com/ALVARES-Titouan-2326003b)
-- [GRIMAUD-Estelle-2326056aa](https://github.com/GRIMAUD-Estelle-2326056aa)
+- [@GRIMAUD-Estelle-2326056aa](https://github.com/GRIMAUD-Estelle-2326056aa)
 
 ## Sources
  - [Article de Culture Sciences Physique sur le jeu de Nim](https://culturesciencesphysique.ens-lyon.fr/ressource/IA-Nim-1.xml)

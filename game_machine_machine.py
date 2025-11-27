@@ -1,5 +1,5 @@
 import random
-from write_excel import WriteExcel
+from write_excel import WriteExcel, WriteExcelReduced
 
 table_color = {"yellow": 1, "red": 2}
 
@@ -78,6 +78,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
 
     # Création d'une nouvelle feuille dans le fichier excel
     writer.add_sheet("test", number_matches, table_color, 6, rewards, punishment)
+    writer_reduced.add_sheet("test")
 
     cups_1 = init_cups(number_matches,6)
     cups_2 = init_cups(number_matches,6)
@@ -145,6 +146,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
 
         # Ecriture des données de la partie sur la feuille
         writer.worksheet.add_game(results, score_1, score_2, path_1, path_2, cups_1, cups_2, cups_reseted_p1=reset_history_1, cups_reseted_p2=reset_history_2)
+        writer_reduced.add_game(player)
 
         """
         print("Voulez-vous rejouer ? Appuyez sur 'o'")
@@ -161,8 +163,10 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
 
 # Création d'un fichier excel
 writer = WriteExcel("test.xlsx")
+writer_reduced = WriteExcelReduced("test_reduced.xlsx")
 print(game(max_games=200))
 print(game(max_games=100))
 print(game(max_games=30))
 # Fermeture du fichier excel
 writer.close_workbook()
+writer_reduced.close_workbook()

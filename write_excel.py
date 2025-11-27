@@ -10,27 +10,39 @@ class WriteExcelReduced:
     def __init__(self, path):
         """
         Fonction d'initialisation des instances de la classe WriteExcelReduced.
-        Initialise un fichier excel et crée de feuille de calcul.
+        Initialise un fichier excel, une feuille de calcul et les formatages des cellules nécessaires.
         :param path: Chemin du fichier excel
         """
 
         self.workbook = xlsxwriter.Workbook(path)
         self.worksheet: WriteSheet = None
         self.game_counter = None
+
+        self.glob_titles_format = self.workbook.add_format({
+            "bold": 1,
+            "bg_color": "#999999",
+            "font_color": "white",
+            "align": "center"
+        })
+        self.glob_values_format = self.workbook.add_format({
+            "align": "center"
+        })
     
     def add_sheet(self, name):
         """
-        Ajoute et initialise une nouvelle feuille de calcul au fichier excel.
+        Ajoute et initialise une nouvelle feuille de calcul au fichier excel et réinitialise le compteur de parties.
         :param name: Nom de la feuille
         """
 
         if self.worksheet != None:
-            self.worksheet.autofit_worksheet()  # Pour une mise en page propre et lisible de la feuille
+            self.worksheet.autofit()  # Pour une mise en page propre et lisible de la feuille
         
         # Gère les noms des feuilles (évite les doublons)
         while (True):
             try:
                 self.worksheet = self.workbook.add_worksheet(name)
+                self.setup()
+                self.game_counter = 0
                 break
             except:
                 last_occ = name.rfind('-')
@@ -43,9 +55,35 @@ class WriteExcelReduced:
                 else:
                     name += "-1"
     
-    def add_game(self, winner):
-        return
+    def setup(self):
+        """
+        Prépare la feuille en y écrivant les paramètres du jeu et les intitulés des colonnes.
+        """
         
+        self.worksheet.write(0, 0, "Partie", self.glob_titles_format)
+        self.worksheet.write(0, 1, "Gagnant", self.glob_titles_format)
+
+    def add_game(self, winner):
+        """
+        Rajoute les données associées à une partie sur la feuille.
+        :param winner: Le joueur ayant gagné la partie
+        """
+
+        self.game_counter += 1
+        self.worksheet.write(self.game_counter, 0, self.game_counter, self.glob_values_format)
+        self.worksheet.write(self.game_counter, 1, winner, self.glob_values_format)
+    
+    def close_workbook(self):
+        """
+        Ferme le fichier excel en édition.
+        """
+
+        if self.worksheet != None:
+            self.worksheet.autofit()
+        self.workbook.close()
+        
+
+
 
 
 class WriteExcel:

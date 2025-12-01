@@ -2,6 +2,13 @@ import random
 from write_excel import WriteExcel, WriteExcelReduced
 
 table_color = {"yellow": 1, "red": 2}
+color_one_match = -1
+for color, match in table_color.items():
+    if match == 1:
+        color_one_match = color
+        break
+if color_one_match == -1:
+    print("paramètres non recevables")
 
 
 def update(nb_matches):
@@ -10,6 +17,7 @@ def update(nb_matches):
     :param nb_matches: Nombre d'allumettes dans le jeu
     :return: Un tableau représentant notre plateau de jeu
     """
+
     board=[]
     for _ in range(nb_matches):
         board.append("/")
@@ -23,14 +31,11 @@ def init_cups(nb_cups, nb_marbles_per_color):
     :param nb_marbles_per_color: Nombre de billes par couleur dans chaque gobelet
     :return: Un tableau contenant les gobelets initialisés
     """
+
     cups = []
-    for _ in range(nb_cups):
-        cup = []
-        for _ in range(nb_marbles_per_color):
-            cup.append("red")
-            cup.append("yellow")
-        cups.append(cup)
-    cups[nb_cups-1] = ["yellow"]*nb_marbles_per_color 
+    for _ in range(nb_cups-1):
+        cups.append([color for color in table_color for _ in range(nb_marbles_per_color)])
+    cups.append([color_one_match for _ in range(nb_marbles_per_color)])
     return cups
 
 
@@ -43,6 +48,7 @@ def learning(path, win, cups, nb_marbles, reset_history) :
     :param nb_marbles: nombre de billes à ajouter ou retirer
     :return: nouveau tableau après apprentissage
     """
+
     for cup_index, color in path :
         if win :
             # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
@@ -67,6 +73,7 @@ def reset_cup(default_count, colors):
     :param colors:
     :return:
     """
+    
     return [color for color in colors for _ in range(default_count)]
 
 
@@ -154,9 +161,9 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="
 # Création d'un fichier excel
 writer = WriteExcel("test")
 writer_reduced = WriteExcelReduced("test")
-print(game(max_games=200))
-print(game(max_games=100))
-print(game(max_games=30))
+#print(game(max_games=200))
+#print(game(max_games=100))
+#print(game(max_games=30))
 # Fermeture du fichier excel
 writer.close_workbook()
 writer_reduced.close_workbook()

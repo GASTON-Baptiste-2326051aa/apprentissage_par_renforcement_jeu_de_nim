@@ -164,9 +164,10 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
 # Création d'un fichier excel
 writer = WriteExcel("test.xlsx")
 writer_reduced = WriteExcelReduced("test_reduced.xlsx")
-print(game(max_games=200))
-print(game(max_games=100))
-print(game(max_games=30))
+game(max_games=200, number_matches=7)
+game(max_games=200, number_matches=11)
+game(max_games=200, number_matches=16)
+game(max_games=200, number_matches=21)
 # Fermeture du fichier excel
 writer.close_workbook()
 writer_reduced.close_workbook()

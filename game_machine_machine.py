@@ -70,15 +70,15 @@ def reset_cup(default_count, colors):
     return [color for color in colors for _ in range(default_count)]
 
 
-def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
+def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="tmp"):
     """
     Fonction principale permettant de jouer au jeu de Nim, opposant un joueur à une machine.
     :return: Ne retourne rien, met fin au programme.
     """
 
     # Création d'une nouvelle feuille dans le fichier excel
-    writer.add_sheet("test", number_matches, table_color, 6, rewards, punishment)
-    writer_reduced.add_sheet("test")
+    writer.add_sheet(sheetname, number_matches, table_color, 6, rewards, punishment)
+    writer_reduced.add_sheet(sheetname)
 
     cups_1 = init_cups(number_matches,6)
     cups_2 = init_cups(number_matches,6)
@@ -148,22 +148,12 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1):
         writer.worksheet.add_game(results, score_1, score_2, path_1, path_2, cups_1, cups_2, cups_reseted_p1=reset_history_1, cups_reseted_p2=reset_history_2)
         writer_reduced.add_game(player)
 
-        """
-        print("Voulez-vous rejouer ? Appuyez sur 'o'")
-        response = input().lower()
-
-        if response == "o":
-            play = True
-        else:
-            play = False
-        """
-
     return f"Score final : {score_1}-{score_2} en {game-1} parties."
 
 
 # Création d'un fichier excel
-writer = WriteExcel("test.xlsx")
-writer_reduced = WriteExcelReduced("test_reduced.xlsx")
+writer = WriteExcel("test")
+writer_reduced = WriteExcelReduced("test")
 print(game(max_games=200))
 print(game(max_games=100))
 print(game(max_games=30))

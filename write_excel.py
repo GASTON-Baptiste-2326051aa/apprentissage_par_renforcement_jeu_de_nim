@@ -7,14 +7,14 @@ class WriteExcelReduced:
     Classe créant un fichier excel et gérant son édition (version réduite)
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         """
         Fonction d'initialisation des instances de la classe WriteExcelReduced.
         Initialise un fichier excel, une feuille de calcul et les formatages des cellules nécessaires.
         :param path: Chemin du fichier excel
         """
 
-        self.workbook = xlsxwriter.Workbook(path)
+        self.workbook = xlsxwriter.Workbook(path+"_reduced.xlsx")
         self.worksheet: WriteSheet = None
         self.game_counter = None
 
@@ -91,14 +91,14 @@ class WriteExcel:
     Classe créant un fichier excel et gérant son édition.
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         """
         Fonction d'initialisation des instances de la classe WriteExcel.
         Initialise un fichier excel, une instance des formatages des cellules nécessaires pour le excel et une instance de feuille de calcul.
         :param path: Chemin du fichier excel
         """
 
-        self.workbook = xlsxwriter.Workbook(path)
+        self.workbook = xlsxwriter.Workbook(path+".xlsx")
         self.formats = AddFormat(self.workbook)
         self.worksheet: WriteSheet = None
     

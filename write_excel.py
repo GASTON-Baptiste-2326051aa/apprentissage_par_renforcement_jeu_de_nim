@@ -171,6 +171,9 @@ class AddFormat:
         self.no_step = workbook.add_format({
             "bg_color": "black"
         })
+        self.game_bottom = workbook.add_format({
+            "bottom_color": "red"
+        })
 
 class WriteSheet:
     """
@@ -303,7 +306,7 @@ class WriteSheet:
             self.worksheet.write(first_row+1, self.states_offset+step[0], self.take[step[1]], self.formats.glob_values_format)
         
         self.worksheet.conditional_format(first_row, self.states_offset, first_row+1, self.states_offset+self.matches-1, {
-            'type':'blanks',
+            'type': 'blanks',
             'format': self.formats.no_step
         })
         
@@ -324,6 +327,12 @@ class WriteSheet:
             for color in self.take:
                 counter += 1
                 self.worksheet.write(first_row+1+self.nb_take+counter, self.states_offset+cup_index, round(cup.count(color)/max(len(cup), 1), 3), self.formats.glob_values_format)
+
+        #self.worksheet.conditional_format(last_row, 0, last_row, self.states_offset+self.matches, {
+        #    'type': 'cell',
+        #    'criteria': '>=',
+        #    'format': self.formats.game_bottom
+        #})
     
     def autofit_worksheet(self):
         """

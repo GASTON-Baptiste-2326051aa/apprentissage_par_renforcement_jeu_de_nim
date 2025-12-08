@@ -1,7 +1,7 @@
 import random
 from write_excel import WriteExcel, WriteExcelReduced
 
-table_color = {"yellow": 1, "red": 2}
+table_color = {"yellow": 1, "red": 2, "blue": 4}
 color_one_match = -1
 for color, match in table_color.items():
     if match == 1:
@@ -32,24 +32,26 @@ def init_cups(nb_cups, nb_marbles_per_color):
     :return: Un tableau contenant les gobelets initialisés
     """
 
-    cups = []
-    for _ in range(nb_cups-1):
-        cups.append([color for color in table_color for _ in range(nb_marbles_per_color)])
-    cups.append([color_one_match for _ in range(nb_marbles_per_color)])
+
+    cups = [init_cup(nb_marbles_per_color, nb_cups-index) for index in range(nb_cups-1)]
+    cups.append([color_one_match])
     return cups
 
-
-def learning(path, win, cups, nb_marbles, reset_history) :
+def learning(path, win, cups, nb_marbles, reset_history, nb_cups):
     """
     Fonction permettant de faire apprendre la machine
-    :param path: tableau contenant les gobelets parcourus par la machine ainsi que la couleur de la bille piochée
-    :param win: machine a gagné (true) ou perdu (false)
-    :param cups: tableau contenant les gobelets
-    :param nb_marbles: nombre de billes à ajouter ou retirer
-    :return: nouveau tableau après apprentissage
+    :param path: Tableau contenant les gobelets parcourus par la machine ainsi que la couleur de la bille piochée
+    :param win: Booléen indiquant si la machine a gagné (true) ou perdu (false)
+    :param cups: Tableau contenant les gobelets
+    :param nb_marbles: Nombre de billes à ajouter ou retirer
+    :param nb_cups: Nombre de gobelets
+    :return: Nouveau tableau après apprentissage
     """
 
     for cup_index, color in path :
+        if cup_index == nb_cups-1:
+            continue
+
         if win :
             # On récupère l'indice du gobelet dans le tableau et on ajoute "nb_marble" fois
             # La couleur qui a permis de gagner
@@ -61,20 +63,20 @@ def learning(path, win, cups, nb_marbles, reset_history) :
                     cups[cup_index].remove(color)
 
             if len(cups[cup_index]) == 0:
-                reset_history.append(cup_index)
-                cups[cup_index]=reset_cup(2, ["yellow", "red"])
+                reset_history.append(cup_index+1)
+                cups[cup_index]=init_cup(2, nb_cups-cup_index)
                 
     return cups
 
-def reset_cup(default_count, colors):
+def init_cup(default_count, cups_left):
     """
-    Fonction permettant de réinitialiser un gobelet avec un nombre par défaut de billes de chaque couleur
-    :param default_count:
-    :param colors:
-    :return:
+    Fonction permettant d'initialiser un gobelet avec un nombre par défaut de billes de chaque couleur
+    :param default_count: Nombre de billes par couleur dans le gobelet
+    :param cups_left: Nombre de gobelets restants, sert à déterminer si certains coups deviennent impossibles à cause d'un nombre de gobelets restants insuffisant
+    :return: Un nouveau gobelet
     """
     
-    return [color for color in colors for _ in range(default_count)]
+    return [color for color in table_color for _ in range(default_count) if table_color[color] <= cups_left]
 
 
 def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="tmp"):
@@ -122,10 +124,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="
             else:
                 cups_index = cups_2[len(cups_2) - nb_matches]
                 choice = random.choice(cups_index)
-                if choice == "red": 
-                    choice_matches = 2 
-                else:
-                    choice_matches = 1
+                choice_matches = table_color.get(choice)
 
                 path_2.append((len(cups_2) - nb_matches, choice))
 
@@ -138,14 +137,14 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="
 
 
         if player == "MACHINE 1":
-            cups_1 = learning(path_1, True, cups_1, rewards, reset_history_1)
-            cups_2 = learning(path_2, False, cups_2, punishment, reset_history_2)
+            cups_1 = learning(path_1, True, cups_1, rewards, reset_history_1, number_matches)
+            cups_2 = learning(path_2, False, cups_2, punishment, reset_history_2, number_matches)
             score_1 += 1
             results = {"P1": "gagne", "P2": "perd"} # Les résultats finaux de la partie pour le excel
 
         elif player == "MACHINE 2":
-            cups_2 = learning(path_2, True, cups_2, rewards, reset_history_2)
-            cups_1 = learning(path_1, False, cups_1, punishment, reset_history_1)
+            cups_2 = learning(path_2, True, cups_2, rewards, reset_history_2, number_matches)
+            cups_1 = learning(path_1, False, cups_1, punishment, reset_history_1, number_matches)
             score_2 += 1
             results = {"P1": "perd", "P2": "gagne"} # Les résultats finaux de la partie pour le excel
 
@@ -162,7 +161,7 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="
 writer = WriteExcel("test")
 writer_reduced = WriteExcelReduced("test")
 
-#game(max_games=2000, number_matches=7)
+print(game(max_games=2000, number_matches=7))
 #game(max_games=2000, number_matches=11)
 #game(max_games=2000, number_matches=16)
 

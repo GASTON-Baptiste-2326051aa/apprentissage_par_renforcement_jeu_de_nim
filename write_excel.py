@@ -297,10 +297,10 @@ class WriteSheet:
             self.worksheet.write(first_row+1+counter+self.nb_take, 4, nb_matches)
         
         for step in steps_p1:
-            self.worksheet.write(first_row, self.states_offset+self.matches-1-step[0], self.take[step[1]], self.formats.glob_values_format)
+            self.worksheet.write(first_row, self.states_offset+step[0], self.take[step[1]], self.formats.glob_values_format)
         
         for step in steps_p2:
-            self.worksheet.write(first_row+1, self.states_offset+self.matches-1-step[0], self.take[step[1]], self.formats.glob_values_format)
+            self.worksheet.write(first_row+1, self.states_offset+step[0], self.take[step[1]], self.formats.glob_values_format)
         
         self.worksheet.conditional_format(first_row, self.states_offset, first_row+1, self.states_offset+self.matches-1, {
             'type':'blanks',

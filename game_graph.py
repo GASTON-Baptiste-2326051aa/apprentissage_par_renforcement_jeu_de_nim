@@ -7,7 +7,16 @@ import networkx as nx
 
 # result = [['red', 'red', 'yellow'],['red', 'yellow', 'red', 'yellow'],['yellow', 'red', 'yellow'],['red', 'yellow', 'red', 'yellow'],['red', 'yellow', 'red', 'yellow'],['red', 'red', 'yellow'],['red', 'yellow', 'red', 'yellow'],['yellow']]
 
-result = [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']]
+# result = [['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'red', 'red'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow', 'yellow', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['red', 'yellow', 'red', 'yellow', 'red', 'yellow'], ['yellow', 'yellow', 'yellow', 'yellow', 'yellow']]
+
+import ast
+
+def read_txt(fichier):
+    with open(fichier, "r") as f:
+        contenu = f.read()
+    return ast.literal_eval(contenu)
+    
+result = read_txt("apprentissage_par_renforcement_jeu_de_nim/results/11_1.txt")
 
 def matrice_adj(result) :
     mat = np.zeros((len(result)+1, len(result)+1), dtype=int)
@@ -64,6 +73,12 @@ def graphe(mat_proba, sommets):
 
     return G
 
+def affichage_lineaire(G):
+    pos = {}
+    for node in G.nodes():
+        pos[node] = (int(node), 0)  # position x=node, y=0
+    return pos
+
 def graphe_trace(G, couleurs = []):
 
     # Disposition des noeuds
@@ -81,6 +96,51 @@ def graphe_trace(G, couleurs = []):
 
     # Afficher le graphe
     plt.title("Graphe orienté et valué")
+    plt.show()
+
+
+# todo : afficher les labels sur les arêtes allant de deux en deux
+def graphe_trace_lineaire(G, couleurs=None):
+    plt.figure(figsize=(14, 4))
+
+    # Sommets ordonnés du plus grand au plus petit
+    ordre = sorted(G.nodes(), key=lambda x: int(x), reverse=True)
+    pos = {node: (i, 0) for i, node in enumerate(ordre)}
+
+    if couleurs is None:
+        couleurs = ["lightblue"] * len(G.nodes())
+
+    # Arêtes courbées pour les transitions de 2 en 2
+    for u, v in G.edges():
+        diff = abs(int(u) - int(v))
+        if diff == 2:
+            rad = 0.3
+        else:
+            rad = 0.0
+
+        nx.draw_networkx_edges(
+            G,
+            pos,
+            edgelist=[(u, v)],
+            connectionstyle=f"arc3,rad={rad}",
+            arrowstyle='->',
+            arrowsize=16
+        )
+
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        node_color=couleurs,
+        node_size=400
+    )
+
+    nx.draw_networkx_labels(G, pos, font_size=10)
+
+    labels = nx.get_edge_attributes(G, 'weight')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_size=8, rotate=False)
+
+    plt.title("Graphe")
+    plt.axis("off")
     plt.show()
 
 # Affichage du graphe à partir de la matrice d'adjacence avec les probabilités
@@ -126,7 +186,7 @@ def graphe_noyau(mat_proba, sommets):
         else :
             couleurs.append("lightblue")
 
-    graphe_trace(G, couleurs)
+    graphe_trace_lineaire(G, couleurs)
 
     return G, couleurs
             

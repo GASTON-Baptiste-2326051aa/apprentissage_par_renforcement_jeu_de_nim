@@ -7,8 +7,6 @@ for color, match in table_color.items():
     if match == 1:
         color_one_match = color
         break
-if color_one_match == -1:
-    print("paramètres non recevables")
 
 
 def update(nb_matches):
@@ -84,6 +82,10 @@ def game(max_games = 30, number_matches=11, rewards=3, punishment=1, sheetname="
     Fonction principale permettant de jouer au jeu de Nim, opposant un joueur à une machine.
     :return: Ne retourne rien, met fin au programme.
     """
+
+    # s'il n'y a aucun coup permettant de ne retirer qu'une seule allumette, l'apprentissage ne peut pas avoir lieu
+    if color_one_match == -1:
+        return "Paramètres non recevables : Aucun coup ne permet de ne retirer qu'une seule allumette"
 
     # Création d'une nouvelle feuille dans le fichier excel
     writer.add_sheet(sheetname, number_matches, table_color, 6, rewards, punishment)

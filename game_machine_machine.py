@@ -1,7 +1,7 @@
 import random
 from write_excel import WriteExcel, WriteExcelReduced
 
-table_color = {"yellow": 1, "red": 2, "blue": 4}
+table_color = {"yellow": 1, "red": 2}
 color_one_match = -1
 for color, match in table_color.items():
     if match == 1:

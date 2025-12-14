@@ -162,3 +162,43 @@ def bars_hypothese4(dfs, step=200):
     plt.tight_layout()
     plt.show()
 
+
+
+def bars_hypothese5(dfs, step=200):
+    """
+    Diagramme en barres illustrant l'évolution de l'apprenissage selon 
+    l'adversaire.
+    """
+    plt.figure(figsize=(14, 7))
+
+    nb_configs = len(dfs)
+    width = 0.8 / nb_configs
+
+    min_len = min(len(df) // step for df in dfs.values())
+    x = np.arange(min_len)
+
+    for i, (name, df) in enumerate(dfs.items()):
+        chunked = []
+
+        for j in range(0, min_len * step, step):
+            bloc = df["win_M1"].iloc[j:j+step]
+            chunked.append(bloc.mean() * 100)
+
+        plt.bar(
+            x + (i - nb_configs / 2) * width + width / 2,
+            chunked,
+            width,
+            label=name
+        )
+
+    plt.xticks(x, [(i + 1) * step for i in x])
+    plt.title("Évolution du taux de victoire selon le type d'adversaire")
+    plt.xlabel("Nombre de parties jouées")
+    plt.ylabel("Taux de victoire moyen (%)")
+    plt.ylim(0, 100)
+    plt.grid(axis="y", alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    

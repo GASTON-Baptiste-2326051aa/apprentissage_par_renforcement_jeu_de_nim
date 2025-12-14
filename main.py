@@ -11,6 +11,7 @@ def create_data():
     hypothese2()
     hypothese3()
     hypothese4()
+    hypothese5()
     
 def show_all_charts():
     show_graph_h1()
@@ -93,6 +94,24 @@ def hypothese4():
     #Fermeture du excel
     writer4.close_workbook()
     writer_reduced4.close_workbook()
+
+def hypothese5():
+    """
+    Fonction principale permettant de créer les données pour l'hypothèse 5
+    :return: Ne retourne rien.
+    """
+    #Création Excel
+    writer5 = WriteExcel("Hypothèse 5")
+    writer_reduced5 = WriteExcelReduced("Hypothèse 5")
+    
+    #Entraînement de l'IA
+    game(5000,11,sheetname="5000 parties",table_color = {"yellow": 1, "red": 2},writer=writer5, writer_reduced=writer_reduced5)
+    game(7500,11,sheetname="7500 parties",table_color = {"yellow": 1, "red": 2},writer=writer5, writer_reduced=writer_reduced5)
+    game(10000,11,sheetname="10000 parties",table_color = {"yellow": 1, "red": 2},writer=writer5, writer_reduced=writer_reduced5)
+    
+    #Fermeture du excel
+    writer5.close_workbook()
+    writer_reduced5.close_workbook()
     
 def show_graph_h1():
     """
@@ -136,7 +155,6 @@ def show_graph_h4():
     dfs_h4 = load_stats("Hypothèse 4_reduced.xlsx",
                         ["2 choix", "3 choix", "4 choix"])
     bars_hypothese4(dfs_h4)
-
 
 
 

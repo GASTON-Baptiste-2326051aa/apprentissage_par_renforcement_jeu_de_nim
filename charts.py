@@ -161,3 +161,4 @@ def bars_hypothese4(dfs, step=200):
     plt.legend()
     plt.tight_layout()
     plt.show()
+

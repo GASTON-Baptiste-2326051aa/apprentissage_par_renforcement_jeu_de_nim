@@ -67,7 +67,7 @@ def game_random(max_games = 2000, number_matches=11, rewards=1, punishment=1, sh
             score_1 += 1
             results = {"P1": "gagne", "P2": "perd"} # Les résultats finaux de la partie pour le excel
 
-        elif player == "MACHINE 2":
+        else:
             cups_1 = learning(path_1, False, cups_1, punishment, reset_history_1, number_matches,table_color)
             score_2 += 1
             results = {"P1": "perd", "P2": "gagne"} # Les résultats finaux de la partie pour le excel

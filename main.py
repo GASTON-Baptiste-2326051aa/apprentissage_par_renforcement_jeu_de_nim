@@ -14,10 +14,10 @@ def create_data():
     hypothese5()
     
 def show_all_charts():
-    show_graph_h1()
-    show_graph_h2()
-    show_graph_h3()
-    show_graph_h4()
+    show_chart_h1()
+    show_chart_h2()
+    show_chart_h3()
+    show_chart_h4()
 
 
 def hypothese1():
@@ -113,7 +113,7 @@ def hypothese5():
     writer5.close_workbook()
     writer_reduced5.close_workbook()
     
-def show_graph_h1():
+def show_chart_h1():
     """
     Fonction principale permettant d'afficher le graphique vérifiant l'hypothèse 1
     :return: Ne retourne rien.
@@ -123,7 +123,7 @@ def show_graph_h1():
     bars_hypothese1(dfs_h1, 200)
 
 
-def show_graph_h2():
+def show_chart_h2():
     """
     Fonction principale permettant d'afficher le graphique vérifiant l'hypothèse 2
     :return: Ne retourne rien.
@@ -136,7 +136,7 @@ def show_graph_h2():
     bars_hypothese2(dfs_h2)
 
 
-def show_graph_h3():
+def show_chart_h3():
     """
     Fonction principale permettant d'afficher le graphique vérifiant l'hypothèse 3
     :return: Ne retourne rien.
@@ -147,7 +147,7 @@ def show_graph_h3():
 
 
 
-def show_graph_h4():
+def show_chart_h4():
     """
     Fonction principale permettant d'afficher le graphique vérifiant l'hypothèse 4
     :return: Ne retourne rien.
@@ -156,8 +156,3 @@ def show_graph_h4():
                         ["2 choix", "3 choix", "4 choix"])
     bars_hypothese4(dfs_h4)
 
-
-
-    
-
-    
